@@ -1,0 +1,45 @@
+name: CI/CD Avanzado
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - qa
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Verificar que README.md exista
+        run: |
+          if [ ! -f "README.md" ]; then
+            echo "❌ Falta el archivo README.md"
+            exit 1
+          fi
+          echo "✅ README.md encontrado"
+
+      - name: Asignar entorno según rama
+        id: set_env
+        run: |
+          BRANCH_NAME="${GITHUB_REF##*/}"
+          echo "Detectado BRANCH: $BRANCH_NAME"
+
+          if [[ "$BRANCH_NAME" == "dev" ]]; then
+            echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
+          elif [[ "$BRANCH_NAME" == "qa" ]]; then
+            echo "DEPLOY_ENV=qa" >> $GITHUB_ENV
+          elif [[ "$BRANCH_NAME" == "main" ]]; then
+            echo "DEPLOY_ENV=main" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_ENV=otro" >> $GITHUB_ENV
+          fi
+
+      - name: Ejecutar despliegue simulado
+        run: bash scripts/deploy.sh
+
