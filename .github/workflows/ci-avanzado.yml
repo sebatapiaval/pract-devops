@@ -23,6 +23,9 @@ jobs:
             exit 1
           fi
           echo "✅ README.md encontrado"
+          
+      - name: Ejecutar pruebas básicas
+        run: bash tests/test_basic.sh      
 
       - name: Asignar entorno según rama
         id: set_env
